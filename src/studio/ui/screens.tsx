@@ -17,6 +17,7 @@ import { GoPoll, TeamPicker, type PlayMode } from './team';
 import { Brand } from './Brand';
 import { MusicButton } from './help';
 import { SkyChart } from './SkyChart';
+import { PlanetBackdrop } from '../three/SpacecraftView';
 import { defaultRoles, makePlayer, ownerOf } from '../model/team';
 
 const ORDER: ScenarioId[] = ['tutorial', 'angola-eo', 'geo-comms', 'lunar-relay', 'mars-orbiter', 'crew-moon'];
@@ -214,6 +215,8 @@ export function Brief() {
   const team = useStudio((s) => s.team);
   const s = a.scenario;
   return (
+    <>
+    <div className="st-brief-planet" aria-hidden><PlanetBackdrop body={s.body} /></div>
     <div className="st-brief">
       <div className="st-brief-main">
         <div className="st-kicker">{s.customer}</div>
@@ -270,6 +273,7 @@ export function Brief() {
         </details>
       </aside>
     </div>
+    </>
   );
 }
 

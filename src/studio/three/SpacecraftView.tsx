@@ -104,6 +104,54 @@ function Planet({ body }: { body: BodyId }) {
   );
 }
 
+/**
+ * The mission's planet on its own, large and low on the right, for the brief's empty background: the same Earth
+ * (NASA's Blue Marble, turned so Africa faces you), Moon or Mars as behind the spacecraft, lit from the left.
+ */
+export function PlanetBackdrop({ body }: { body: BodyId }) {
+  return (
+    <IfWebGl>
+      <Canvas camera={{ position: [0, 0, 30], fov: 20 }} dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
+        <ambientLight intensity={0.12} />
+        <directionalLight position={[-8, 5, 6]} intensity={2.6} />
+        <directionalLight position={[6, -2, -4]} intensity={0.4} color="#60bee8" />
+        <BackdropGlobe body={body} />
+      </Canvas>
+    </IfWebGl>
+  );
+}
+
+function BackdropGlobe({ body }: { body: BodyId }) {
+  const ref = useRef<THREE.Mesh>(null);
+  const viewport = useThree((s) => s.viewport);
+  useFrame((_, dt) => { if (ref.current && !REDUCED_MOTION) ref.current.rotation.y += dt * 0.006; });
+  const tex = useMemo(() => (body === 'earth' ? null : rockTexture(body)), [body]);
+  // sized to the view, so it sits the same on any screen: centre below and right of the middle
+  const r = Math.min(viewport.height * 0.62, viewport.width * 0.42);
+  return (
+    <group position={[viewport.width * 0.27, -viewport.height * 0.36 - r * 0.42, 0]}>
+      {/* rotation.y = π/2 − 2π(lon+180)/360 brings a longitude to the front (about 20° E, Angola); tilting the
+          globe by about −57° lifts 12° S into the part that shows above the bottom of the screen */}
+      <mesh ref={ref} rotation={body === 'earth' ? [-1, -1.92, 0] : [-0.5, 0.8, 0]}>
+        <sphereGeometry args={[r, 96, 64]} />
+        {body === 'earth' ? (
+          <Suspense fallback={<meshStandardMaterial color="#175195" />}>
+            <EarthGlobe />
+          </Suspense>
+        ) : (
+          <meshStandardMaterial map={tex!} roughness={1} />
+        )}
+      </mesh>
+      {body !== 'moon' && (
+        <mesh scale={1.025}>
+          <sphereGeometry args={[r, 64, 48]} />
+          <meshBasicMaterial color={body === 'earth' ? '#60bee8' : '#c98a80'} transparent opacity={0.16} side={THREE.BackSide} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
 /** A holographic assembly stand under the spacecraft while it is being designed. */
 function Stand({ empty }: { empty: boolean }) {
   const ring = useRef<THREE.Group>(null);

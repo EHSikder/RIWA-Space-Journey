@@ -347,7 +347,9 @@
 .st-small-note { display: none; }
 
 /* ------------------------------------------------------------ brief */
-.st-brief { height: 100%; overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; padding: 28px 5vw 130px; }
+.st-brief { position: relative; z-index: 1; height: 100%; overflow-y: auto; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 28px; padding: 28px 5vw 130px; }
+/* the mission's planet, rising in the lower right behind the brief (three/SpacecraftView.tsx) */
+.st-brief-planet { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .st-brief h2 { font-size: clamp(40px, 4.4vw, 64px); margin: 10px 0 16px; }
 .st-brief-main { padding-top: 4vh; }
 .st-brief-text { font-size: 17px; line-height: 1.65; color: var(--st-body); max-width: 68ch; }
@@ -360,10 +362,10 @@
 .st-brief-crit em { display: inline-flex; align-items: center; gap: 5px; font-style: normal; font-size: 17px; color: var(--sky); }
 .st-brief-main h3 { margin-top: 28px; color: var(--sky); }
 /* always on screen: the way on to the design desks */
-.st-brief-go { position: fixed; bottom: 18px; left: 5vw; right: calc(5vw + 388px); width: fit-content; max-width: calc(90vw - 388px); margin: 0 auto; z-index: 5; display: flex; align-items: center; gap: 16px; max-width: calc(100vw - 32px); padding: 10px 12px 10px 20px; border-radius: 22px; background: rgba(16, 22, 46, 0.86); backdrop-filter: blur(18px) saturate(140%); border: 1px solid var(--st-line2); box-shadow: var(--shadow); }
+.st-brief-go { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); width: max-content; z-index: 5; display: flex; align-items: center; gap: 16px; max-width: calc(100vw - 32px); padding: 10px 12px 10px 20px; border-radius: 22px; background: rgba(16, 22, 46, 0.86); backdrop-filter: blur(18px) saturate(140%); border: 1px solid var(--st-line2); box-shadow: var(--shadow); }
 .st-brief-go span { font-size: 14px; color: var(--st-body); }
 .st-brief-go button { white-space: nowrap; }
-.st-brief-side { background: var(--st-panel); border: 1px solid var(--st-line); border-radius: 22px; padding: 18px 20px 6px; align-self: start; box-shadow: var(--shadow); }
+.st-brief-side { justify-self: center; align-self: center; width: min(400px, 100%); background: var(--st-panel); border: 1px solid var(--st-line); border-radius: 22px; padding: 18px 20px 6px; box-shadow: var(--shadow); }
 /* folded sections: closed until someone wants to read more */
 .st-learn { border-top: 1px solid var(--st-line); }
 .st-brief-side .st-kicker + .st-learn { border-top: none; margin-top: 6px; }
@@ -424,6 +426,7 @@
   .st-segments { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .st-cml-ladder { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .st-brief { grid-template-columns: 1fr; }
+  .st-brief-side { justify-self: start; align-self: start; width: min(520px, 100%); }
   .st-diff-row, .st-diff-row.three { grid-template-columns: 1fr 1fr; }
 }
 
@@ -480,7 +483,7 @@
 .st-decision p { color: var(--st-body); font-size: 16px; line-height: 1.6; }
 .st-dec-options { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
 .studio .st-dec-options button { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left; padding: 13px 18px; border-radius: 18px; }
-.studio .st-dec-options button:hover:not(:disabled) { background: rgba(96, 190, 232, 0.1); border-color: var(--sky); }
+.studio .st-dec-options button:not(.st-primary):hover:not(:disabled) { background: rgba(96, 190, 232, 0.1); border-color: var(--sky); }
 .st-dec-options b { font-size: 16px; }
 .st-dec-options span { color: var(--st-body); font-size: 14.5px; }
 
@@ -541,13 +544,40 @@
 .st-board li.on { color: var(--sky); font-weight: 700; }
 .st-board b { font-family: var(--mono); text-align: right; }
 
+/* things only the printed report shows (the reasons that are tooltips on screen), and the reverse */
+.st-print-only { display: none; }
+
+/* Printing the report: the whole of it, on as many pages as it needs, dark text on white paper */
 @media print {
-  .studio { position: static; background: #fff; color: #000; overflow: visible; }
-  .studio::before, .st-top, .st-report-actions { display: none; }
-  .st-report { height: auto; overflow: visible; }
-  .st-card-panel, .st-report-hero { background: #fff; border-color: #bbb; box-shadow: none; break-inside: avoid; }
-  .studio h3, .st-sub, .st-dim, .st-mini-row { color: #444; }
-  .st-why, .st-outcome, .st-timeline p { color: #111; }
+  @page { margin: 14mm 12mm; }
+  html, body, #root { height: auto !important; overflow: visible !important; background: #fff !important; }
+  .app { position: static !important; }
+  .studio {
+    --st-text: #111; --st-body: #2b303b; --st-muted: #5b6577; --st-line: #d5dae3; --st-line2: #bcc3cf;
+    --st-panel: #fff; --st-panel2: #f3f5f9; --st-raise: #fff; --sky: #175195; --accent: #175195;
+    --st-good: #137a43; --st-warn: #8a6a00; --st-fail: #b3261e; --st-over: #8a6a00; --shadow: none;
+    position: static !important; display: block !important; overflow: visible !important; zoom: 1 !important;
+    background: #fff !important; color: #111;
+  }
+  .studio::before, .st-starfield, .st-top, .st-report-actions, .st-coach, .st-coach-open, .st-lost, .st-modal, .st-screen-only { display: none !important; }
+  .st-body { display: block; overflow: visible; min-height: 0; }
+  .st-report { height: auto; overflow: visible; padding: 0; }
+  /* one column that breaks across pages (a grid's panels would be cut at the page's end) */
+  .st-report-grid { display: block; }
+  .st-card-panel { margin: 0 0 12px; background: #fff; border: 1px solid var(--st-line2); break-inside: auto; }
+  .st-report-hero { margin-bottom: 12px; background: #fff; border: 1px solid var(--st-line2); box-shadow: none; break-inside: avoid; }
+  .st-report-log { max-height: none; overflow: visible; }
+  .studio h3, .studio h4 { break-after: avoid; }
+  .st-timeline li, .st-table tr, .st-scorebar, .st-mini-row, .st-real article, .st-why li, .st-board li, .st-spark { break-inside: avoid; }
+  .st-print-only { display: block; }
+  .st-print-why { margin-top: 2px; font-size: 12.5px; line-height: 1.45; color: var(--st-body); }
+  .st-scorebar { grid-template-columns: 230px 1fr 82px; }
+  .st-badge.fail, .studio h4.st-bad { color: var(--st-fail); }
+  .rank-platinum .st-score em { color: #111; }
+  .st-real a { color: var(--sky); }
+  /* the bars, badges and timeline marks keep their colour even when the browser leaves backgrounds out */
+  .st-bar, .st-bar span, .st-badge, .st-tl-icon, .st-spark { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .st-bar { background: #e4e8ef; }
 }
 
 /* ------------------------------------------------------------ team play */
@@ -627,7 +657,7 @@
 .st-coach-bar span { display: block; height: 100%; background: var(--sky); }
 .studio .st-coach-open { position: absolute; right: 18px; bottom: 18px; top: auto; z-index: 15; border-color: var(--sky); }
 /* on the brief the guide opens where its button was, clear of the start bar */
-.st-coach.phase-brief { top: auto; right: 18px; bottom: 18px; }
+.st-coach.phase-brief { top: auto; right: 18px; bottom: 96px; }
 .studio .st-rail-btn.coach { animation: st-pulse 1.8s ease-in-out infinite; color: var(--st-text); }
 @keyframes st-pulse { 50% { box-shadow: inset 0 0 0 2px var(--sky), 0 0 14px rgba(96, 190, 232, 0.4); } }
 .st-glossary { width: min(760px, 94vw); max-height: 84vh; display: flex; flex-direction: column; padding: 20px 24px; border-radius: 26px; background: var(--st-raise); border: 1px solid var(--st-line2); box-shadow: var(--shadow); }
@@ -664,7 +694,8 @@
   .st-review-grid, .st-report-grid, .st-brief { grid-template-columns: minmax(0, 1fr); }
   .st-cml-ladder { grid-template-columns: minmax(0, 1fr); }
   .st-verdict { left: 10px; right: 10px; transform: none; flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
-  .st-brief-go { left: 10px; right: 10px; width: auto; max-width: none; margin: 0; padding: 8px; }
+  .st-brief-go { left: 10px; right: 10px; transform: none; width: auto; max-width: none; margin: 0; padding: 8px; }
+  .st-brief-planet { display: none; }
   .studio .st-coach-open { right: 10px; bottom: 12px; }
   .studio .st-coach-open.phase-brief { bottom: 96px; }
   .st-coach.phase-brief { bottom: 96px; }
@@ -975,3 +1006,4 @@
   .st-brief-facts > div { min-width: 0; }
   .st-brief-facts > div:last-child { grid-column: 1 / -1; }
 }
+@media (max-width: 1100px) and (min-width: 761px) { .st-brief-go span { display: none; } }

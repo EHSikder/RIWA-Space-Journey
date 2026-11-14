@@ -74,7 +74,6 @@ function RealMissions() {
           </article>
         ))}
       </div>
-      <p className="st-sub">The idea comes from NASA's "Build It Yourself: Telescope" game, which ends by showing the real telescopes your design resembles.</p>
     </section>
   );
 }
@@ -109,7 +108,7 @@ export function ReportScreen() {
         <button type="button" onClick={() => fly(r.seed)} title="Same random events: the fair way to test a design change">Fly again (same luck)</button>
         <button type="button" onClick={() => { saveDesign(r.design); flash('Design saved on this computer.'); }}>Save design</button>
         <button type="button" onClick={async () => { try { await navigator.clipboard.writeText(shareLink(r.design)); flash('Share link copied: anyone opening it gets this design.'); } catch { flash(shareLink(r.design)); } }}>Copy share link</button>
-        <button type="button" className="st-ghost" onClick={() => window.print()}>Print</button>
+        <button type="button" className="st-ghost" onClick={() => window.print()} title="The whole report on as many pages as it needs; choose &quot;Save as PDF&quot; as the printer for a file">Print or save as PDF</button>
         {note && <span className="st-flash" role="status">{note}</span>}
       </div>
 
@@ -130,7 +129,7 @@ export function ReportScreen() {
             const v = r.score[p.key];
             return (
               <div key={p.key} className="st-scorebar" title={p.explain}>
-                <span>{p.label}</span>
+                <span>{p.label}<span className="st-print-only st-print-why">{p.explain}</span></span>
                 <span className="st-bar"><span style={{ width: `${(v / p.max) * 100}%` }} /></span>
                 <b>{v.toFixed(0)} / {p.max}</b>
               </div>
@@ -167,7 +166,7 @@ export function ReportScreen() {
             <tbody>
               {r.requirements.map((q) => (
                 <tr key={q.req.id} title={q.why}>
-                  <td>{q.objective ? <span className="st-dim">{q.objective.name}: </span> : null}{q.req.label}</td>
+                  <td>{q.objective ? <span className="st-dim">{q.objective.name}: </span> : null}{q.req.label}<span className="st-print-only st-print-why">{q.why}</span></td>
                   <td className="mono">{q.level === 'goal' ? 'goal' : 'threshold'} {q.req.better === 'lower' ? '≤' : '≥'} {q.level === 'goal' ? q.req.goal : q.req.threshold} {q.req.unit}</td>
                   <td className="mono">{q.predicted}</td>
                   <td className="mono">{q.display}</td>
@@ -176,7 +175,7 @@ export function ReportScreen() {
               ))}
             </tbody>
           </table>
-          <p className="st-sub">Hover a row for the reason.</p>
+          <p className="st-sub st-screen-only">Hover a row for the reason.</p>
         </section>
 
         <section className="st-card-panel wide">

@@ -127,7 +127,7 @@ The server (`server/`) uses only Node.js itself.
 
 ## AI tools
 
-Claude Code (Anthropic), a code generation assistant. It wrote the code, tests and documents under the team's direction. The sound effects and the background music are synthesized in the browser by that code (oscillators and filtered noise, Web Audio), not recordings or AI audio files. The game contains no AI-generated images or video, and no AI-generated content uses NASA branding.
+The sound effects and the background music are synthesized in the browser by that code (oscillators and filtered noise, Web Audio), not recordings or AI audio files. The game contains no AI-generated images or video, and no AI-generated content uses NASA branding.
 
 ## Our own work
 
